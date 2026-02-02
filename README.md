@@ -4,7 +4,6 @@ This repository contains the work for the **FICO Educational Challenge 2026**, f
 
 The project follows an end-to-end ML lifecycle: data generation, model training and evaluation, and final implementation and optimization.
 
----
 
 ###  Project Overview
 
@@ -16,7 +15,6 @@ The solution is evaluated on:
 - **Latency** (speed of processing conversations)  
 - **Presentation quality**
 
----
 
 ###  Project Workstreams
 
@@ -34,7 +32,6 @@ The project is organized into three core workstreams:
    - Build end-to-end pipelines  
    - Fine-tune models and optimize inference  
 
----
 
 ###  Getting Started (For Collaborators)
 
