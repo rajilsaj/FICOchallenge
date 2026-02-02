@@ -1,4 +1,4 @@
-# FICO Educational Challenge 2026
+## FICO Educational Challenge 2026
 
 This repository contains the work for the **FICO Educational Challenge 2026**, focused on building a machine learning system for **intent classification in customer collections conversations** using **synthetic data**.
 
@@ -6,7 +6,7 @@ The project follows an end-to-end ML lifecycle: data generation, model training 
 
 ---
 
-## 📌 Project Overview
+###  Project Overview
 
 Banks and lenders interact with customers across digital channels (SMS, chat, email, etc.) to resolve past-due accounts.  
 The goal of this project is to accurately and efficiently classify customer **intent** (e.g., `PAY_NOW`, `REQUEST_EXTENSION`, `SPEAK_TO_AGENT`) in a **high-risk financial context**, where accuracy and latency are critical.
@@ -18,7 +18,7 @@ The solution is evaluated on:
 
 ---
 
-## 🧩 Project Workstreams
+###  Project Workstreams
 
 The project is organized into three core workstreams:
 
@@ -36,11 +36,11 @@ The project is organized into three core workstreams:
 
 ---
 
-## 🚀 Getting Started (For Collaborators)
+###  Getting Started (For Collaborators)
 
 Follow these steps to connect to the project and start contributing.
 
-### 1️⃣ Clone the Repository
+###  Clone the Repository
 ```bash
 git clone https://github.com/rajilsaj/FICOchallenge.git
 cd FICOchallenge
