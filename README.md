@@ -21,16 +21,18 @@ The notebooks are designed to run in **Google Colab** and require a specific fol
 **Important:** Once you open a notebook in Colab from the links below, you **must** go to `File > Save a copy in Drive` to save it to your own account before running it.
 
 #### A. Google Drive Structure
-Create the following folders and upload the necessary files (if available) to your Google Drive (`MyDrive`):
+Create the following folders in your **Google Drive** (`My Drive`):
 
 ```text
-MyDrive/
+My Drive/
 └── FICO Analytic Challenge/
-    ├── Data/
-    │   ├── collections_intents.csv
-    │   ├── seed_scenarios.csv
-    │   └── conversations.csv (Generated in Week 3 or uploaded)
-    └── Model/ (Output directory for trained models)
+    ├── Week_05/
+    ├── Week_04/
+    ├── Week_03/
+    ├── Week_02/
+    ├── Week_01/
+    ├── Model/
+    └── Data/
 ```
 
 #### B. Opening Notebooks in Colab
