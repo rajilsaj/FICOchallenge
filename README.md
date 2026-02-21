@@ -5,10 +5,6 @@ This repository contains the work for the **FICO Educational Challenge 2026**, f
 The project follows an end-to-end ML lifecycle: data generation, model training and evaluation, and final implementation and optimization.
 
 
-##  Project Overview
-
-##  Project Workstreams
-
 ##  Getting Started (For Collaborators)
 
 Follow these steps to set up the project and start contributing.
