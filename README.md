@@ -4,6 +4,12 @@ This repository contains the work for the **FICO Educational Challenge 2026**, f
 
 The project follows an end-to-end ML lifecycle: data generation, model training and evaluation, and final implementation and optimization.
 
+## Web App
+
+The `web_app/` directory contains the source code for the web application designed to showcase the **results** of all **steps** of the challenge. It visualizes the project's evolution, displaying **metrics** and **outputs** from the initial data generation **phases** through to the final model **evaluations**.
+
+- **Tech Stack:** Flask (Backend) and MySQL (Database).
+- **Hosting:** It is hosted at [fico.pythonanywhere.com](https://fico.pythonanywhere.com/).
 
 ##  Getting Started (For Collaborators)
 
@@ -55,3 +61,7 @@ To test the notebooks on your side:
    - **Week 5 (Prep):** Check `Data/` for `_train`, `_test`, and `_validation` splits.
    - **Week 5 (Training):** Check the `Model/` folder for saved weights and evaluation logs.
 
+
+## License
+
+This project is under the **MIT** [LICENSE](LICENSE).
