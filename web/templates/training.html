@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1 class="page-title">Model Training</h1>
+
+<div style="display: flex; gap: 2rem;">
+    <!-- Sidebar Controls -->
+    <div
+        style="width: 300px; flex-shrink: 0; background: var(--sidebar-bg); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-color);">
+        <form id="trainForm">
+            <div class="form-group" style="margin-bottom: 2rem;">
+                <label class="form-label">Epochs: <span id="epochValue">3</span></label>
+                <input type="range" class="form-control" id="epochs" min="1" max="10" step="1" value="3"
+                    oninput="document.getElementById('epochValue').innerText = this.value">
+            </div>
+            <button type="button" class="btn btn-primary" onclick="startTraining()">Start Training</button>
+        </form>
+    </div>
+
+    <!-- Main Content -->
+    <div style="flex-grow: 1;">
+        <div id="statusContainer" class="status-container"></div>
+
+        <div id="progressSection"
+            style="display: none; background: var(--sidebar-bg); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-color);">
+            <h3 style="margin-bottom: 1rem;">Training Progress</h3>
+            <div style="width: 100%; background-color: #e9ecef; border-radius: 4px; height: 1.5rem; overflow: hidden;">
+                <div id="progressBar"
+                    style="width: 0%; height: 100%; background-color: var(--primary-color); transition: width 0.5s ease; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.8rem; font-weight: bold;">
+                    0%</div>
+            </div>
+            <p id="progressText" style="margin-top: 1rem; color: var(--text-muted);">Initializing...</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

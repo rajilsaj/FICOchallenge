@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1 class="page-title">Dashboard</h1>
+
+<div class="metrics-container">
+    <div class="metric-card">
+        <div class="metric-label">Synthetic Rows</div>
+        <div class="metric-value">{{ num_rows }}</div>
+    </div>
+
+    <div class="metric-card">
+        <div class="metric-label">Active Model</div>
+        <div class="metric-value">Llama 3.1</div>
+    </div>
+
+    <div class="metric-card">
+        <div class="metric-label">System Status</div>
+        <div class="metric-value">Operational</div>
+    </div>
+</div>
+{% endblock %}

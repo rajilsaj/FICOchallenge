@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FICO Synthetic Intelligence Platform</title>
+    <!-- Use Inter font for a modern look -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    {% block head %}{% endblock %}
+</head>
+<body>
+    
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <img src="{{ url_for('static', filename='../assets/FICO2025-Full.jpg') }}" alt="FICO Logo" class="sidebar-logo" onerror="this.src='https://via.placeholder.com/250x80?text=FICO+Logo'">
+        <hr>
+        {% block sidebar %}{% endblock %}
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Navigation -->
+        <nav class="top-nav">
+            <a href="{{ url_for('dashboard') }}" class="nav-btn {% if active_page == 'dashboard' %}active{% endif %}">Dashboard</a>
+            <a href="{{ url_for('generation') }}" class="nav-btn {% if active_page == 'generation' %}active{% endif %}">Generation</a>
+            <a href="{{ url_for('test_set') }}" class="nav-btn {% if active_page == 'test_set' %}active{% endif %}">Test Set</a>
+            <a href="{{ url_for('training') }}" class="nav-btn {% if active_page == 'training' %}active{% endif %}">Training</a>
+            <a href="{{ url_for('fine_tuning') }}" class="nav-btn {% if active_page == 'fine_tuning' %}active{% endif %}">Fine-Tuning</a>
+            <a href="{{ url_for('reports') }}" class="nav-btn {% if active_page == 'reports' %}active{% endif %}">Reports</a>
+            <a href="{{ url_for('projects') }}" class="nav-btn {% if active_page == 'projects' %}active{% endif %}">Projects</a>
+        </nav>
+        <hr>
+
+        <!-- Page Content -->
+        {% block content %}{% endblock %}
+    </main>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

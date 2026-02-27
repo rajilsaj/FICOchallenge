@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1 class="page-title">Model Evaluation</h1>
+
+<div style="display: flex; gap: 2rem;">
+    <!-- Sidebar Controls -->
+    <div
+        style="width: 300px; flex-shrink: 0; background: var(--sidebar-bg); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-color);">
+        <form id="evalForm">
+            <div class="form-group" style="margin-bottom: 2rem;">
+                <label class="form-label">Upload Test Set (CSV)</label>
+                <input type="file" id="testFile" class="form-control" accept=".csv" required>
+            </div>
+            <button type="button" class="btn btn-primary" onclick="runEvaluation()">Run Evaluation</button>
+        </form>
+    </div>
+
+    <!-- Main Content -->
+    <div style="flex-grow: 1;">
+        <div id="statusContainer" class="status-container"></div>
+
+        <div id="evalResults" style="display: none;">
+            <div class="metrics-container">
+                <div class="metric-card">
+                    <div class="metric-label">Accuracy</div>
+                    <div class="metric-value" id="accValue">--</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-label">F1 Score</div>
+                    <div class="metric-value" id="f1Value">--</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

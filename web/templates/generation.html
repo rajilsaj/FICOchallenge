@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1 class="page-title">Synthetic Data Generation</h1>
+
+<div style="display: flex; gap: 2rem;">
+    <!-- Sidebar Controls inside page -->
+    <div
+        style="width: 300px; flex-shrink: 0; background: var(--sidebar-bg); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-color);">
+        <h3 class="sidebar-heading">Upload Existing Dataset</h3>
+        <form id="uploadForm">
+            <div class="file-upload" onclick="document.getElementById('csvFile').click()">
+                <p>Click to upload CSV</p>
+                <input type="file" id="csvFile" accept=".csv" onchange="handleFileUpload(event)">
+            </div>
+        </form>
+
+        <hr>
+        <div style="text-align: center; color: var(--text-muted); margin: 1rem 0;">OR</div>
+        <hr>
+
+        <h3 class="sidebar-heading">Generate Custom Dataset</h3>
+        <form id="generateForm">
+            <div class="form-group">
+                <label class="form-label">Model</label>
+                <select class="form-control" id="modelSelect">
+                    <option>Llama 3.1 (Unsloth)</option>
+                    <option>Mistral</option>
+                    <option>Ollama</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Temperature: <span id="tempValue">0.7</span></label>
+                <input type="range" class="form-control" id="temperature" min="0.1" max="1.5" step="0.1" value="0.7"
+                    oninput="document.getElementById('tempValue').innerText = this.value">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Number of Scenarios</label>
+                <input type="number" class="form-control" id="numScenarios" min="1" max="100" value="5">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Variants per Scenario</label>
+                <input type="number" class="form-control" id="numVariants" min="1" max="20" value="5">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Sentiments</label>
+                <select class="form-control" id="sentiments" multiple style="height: 100px;">
+                    <option value="angry">angry</option>
+                    <option value="confused">confused</option>
+                    <option value="neutral" selected>neutral</option>
+                    <option value="frustrated">frustrated</option>
+                </select>
+                <small style="color: var(--text-muted);">Hold Ctrl/Cmd to select multiple</small>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Speech Types</label>
+                <select class="form-control" id="speechTypes" multiple style="height: 100px;">
+                    <option value="casual">casual</option>
+                    <option value="professional" selected>professional</option>
+                    <option value="slang">slang</option>
+                    <option value="typos">typos</option>
+                </select>
+                <small style="color: var(--text-muted);">Hold Ctrl/Cmd to select multiple</small>
+            </div>
+
+            <button type="button" class="btn btn-primary" onclick="generateDataset()">Generate Dataset</button>
+        </form>
+    </div>
+
+    <!-- Main Generation Output -->
+    <div style="flex-grow: 1;">
+        <div id="statusContainer" class="status-container"></div>
+
+        {% if preview_data %}
+        <div id="previewSection">
+            <h3 style="margin-bottom: 1rem;">Preview</h3>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            {% for col in columns %}
+                            <th>{{ col }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in preview_data %}
+                        <tr>
+                            {% for col in columns %}
+                            <td>{{ row[col] }}</td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <a href="{{ url_for('download') }}" class="btn btn-primary" style="width: auto;">Download Dataset</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

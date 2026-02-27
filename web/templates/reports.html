@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1 class="page-title">Analytics & Reports</h1>
+
+<div
+    style="background: var(--sidebar-bg); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-color); margin-top: 1rem;">
+    <canvas id="reportsChart" width="400" height="150"></canvas>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const ctx = document.getElementById('reportsChart').getContext('2d');
+
+        // Data passed from Flask backend
+        const chartData = {{ chart_data | tojson
+    }};
+    const labels = Array.from({ length: chartData.Precision.length }, (_, i) => i + 1);
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Precision',
+                    data: chartData.Precision,
+                    borderColor: '#0d6efd',
+                    backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                },
+                {
+                    label: 'Recall',
+                    data: chartData.Recall,
+                    borderColor: '#198754',
+                    backgroundColor: 'rgba(25, 135, 84, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                },
+                {
+                    label: 'F1 Score',
+                    data: chartData.F1,
+                    borderColor: '#ffc107',
+                    backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: false
+                }
+            }
+        }
+    });
+    });
+</script>
+{% endblock %}

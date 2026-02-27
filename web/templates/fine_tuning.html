@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1 class="page-title">Fine-Tuning</h1>
+
+<div style="display: flex; gap: 2rem;">
+    <!-- Sidebar Controls -->
+    <div
+        style="width: 300px; flex-shrink: 0; background: var(--sidebar-bg); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-color);">
+        <form id="finetuneForm">
+            <div class="form-group" style="margin-bottom: 2rem;">
+                <label class="form-label">Learning Rate: <span id="lrValue">0.001</span></label>
+                <input type="range" class="form-control" id="lr" min="0.00001" max="0.01" step="0.00001" value="0.001"
+                    oninput="document.getElementById('lrValue').innerText = this.value">
+            </div>
+            <button type="button" class="btn btn-primary" onclick="applyFinetuning()">Apply Fine-Tuning</button>
+        </form>
+    </div>
+
+    <!-- Main Content -->
+    <div style="flex-grow: 1;">
+        <div id="statusContainer" class="status-container"></div>
+    </div>
+</div>
+{% endblock %}
