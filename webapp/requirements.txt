@@ -1,2 +1,15 @@
+# Web Framework
 Flask==3.0.2
 Flask-Cors==4.0.0
+
+# Data Processing
+pandas
+numpy
+scikit-learn
+
+# Machine Learning & AI
+torch
+transformers
+datasets
+evaluate
+accelerate
