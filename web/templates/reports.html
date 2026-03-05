@@ -1,11 +1,35 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1 class="page-title">Analytics & Reports</h1>
+<div class="mb-8 flex items-center justify-between">
+    <div>
+        <h1 class="text-3xl font-bold text-white tracking-tight">Analytics & Reports</h1>
+        <p class="text-dark-muted mt-2">Performance metrics and historical accuracy data.</p>
+    </div>
+    <button
+        class="px-4 py-2 bg-dark-surface hover:bg-dark-border border border-dark-border text-white text-sm font-medium rounded-lg transition-colors flex items-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+            </path>
+        </svg>
+        Export PDF
+    </button>
+</div>
 
-<div
-    style="background: var(--sidebar-bg); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-color); margin-top: 1rem;">
-    <canvas id="reportsChart" width="400" height="150"></canvas>
+<div class="bg-dark-surface p-6 rounded-2xl border border-dark-border shadow-lg relative glow-sm">
+    <div class="mb-6 flex items-center justify-between">
+        <h3 class="text-lg font-semibold text-white">Model Metrics Over Time</h3>
+        <select
+            class="bg-dark-bg border border-dark-border rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-brand-500 cursor-pointer">
+            <option>Last 30 Days</option>
+            <option>Last 7 Days</option>
+            <option>All Time</option>
+        </select>
+    </div>
+    <div class="relative w-full aspect-[21/9]">
+        <canvas id="reportsChart"></canvas>
+    </div>
 </div>
 {% endblock %}
 
@@ -17,7 +41,11 @@
         // Data passed from Flask backend
         const chartData = {{ chart_data | tojson
     }};
-    const labels = Array.from({ length: chartData.Precision.length }, (_, i) => i + 1);
+    const labels = Array.from({ length: chartData.Precision.length }, (_, i) => `Run ${i + 1}`);
+
+    // Set global defaults for dark mode Chart.js
+    Chart.defaults.color = '#94a3b8'; // text-dark-muted
+    Chart.defaults.font.family = "'Outfit', sans-serif";
 
     new Chart(ctx, {
         type: 'line',
@@ -27,31 +55,47 @@
                 {
                     label: 'Precision',
                     data: chartData.Precision,
-                    borderColor: '#0d6efd',
-                    backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                    borderColor: '#60a5fa', // brand-400
+                    backgroundColor: 'rgba(96, 165, 250, 0.1)',
                     tension: 0.4,
-                    fill: true
+                    fill: true,
+                    pointBackgroundColor: '#0f1117',
+                    pointBorderColor: '#60a5fa',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
                 },
                 {
                     label: 'Recall',
                     data: chartData.Recall,
-                    borderColor: '#198754',
-                    backgroundColor: 'rgba(25, 135, 84, 0.1)',
+                    borderColor: '#34d399', // emerald-400
+                    backgroundColor: 'rgba(52, 211, 153, 0.1)',
                     tension: 0.4,
-                    fill: true
+                    fill: true,
+                    pointBackgroundColor: '#0f1117',
+                    pointBorderColor: '#34d399',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
                 },
                 {
                     label: 'F1 Score',
                     data: chartData.F1,
-                    borderColor: '#ffc107',
-                    backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                    borderColor: '#c084fc', // purple-400
+                    backgroundColor: 'rgba(192, 132, 252, 0.1)',
                     tension: 0.4,
-                    fill: true
+                    fill: true,
+                    pointBackgroundColor: '#0f1117',
+                    pointBorderColor: '#c084fc',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
                 }
             ]
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             interaction: {
                 mode: 'index',
                 intersect: false,
@@ -59,11 +103,42 @@
             plugins: {
                 legend: {
                     position: 'top',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 20,
+                        font: { size: 13, weight: '500' }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(30, 33, 43, 0.9)', // dark-surface
+                    titleColor: '#fff',
+                    bodyColor: '#e2e8f0', // dark-text
+                    borderColor: '#2d3342', // dark-border
+                    borderWidth: 1,
+                    padding: 12,
+                    boxPadding: 6,
+                    usePointStyle: true
                 }
             },
             scales: {
+                x: {
+                    grid: {
+                        color: 'rgba(45, 51, 66, 0.5)', // dark-border/50
+                        drawBorder: false,
+                    },
+                    ticks: {
+                        font: { size: 12 }
+                    }
+                },
                 y: {
-                    beginAtZero: false
+                    beginAtZero: false,
+                    grid: {
+                        color: 'rgba(45, 51, 66, 0.5)', // dark-border/50
+                        drawBorder: false,
+                    },
+                    ticks: {
+                        font: { size: 12 }
+                    }
                 }
             }
         }

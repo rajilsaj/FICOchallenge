@@ -1,43 +1,163 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FICO Synthetic Intelligence Platform</title>
-    <!-- Use Inter font for a modern look -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            300: '#93c5fd',
+                            400: '#60a5fa',
+                            500: '#3b82f6', // Primary FICO-ish blue
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                            950: '#172554',
+                        },
+                        dark: {
+                            bg: '#0f1117', // Very dark blue/slate
+                            surface: '#1e212b',
+                            border: '#2d3342',
+                            text: '#e2e8f0',
+                            muted: '#94a3b8'
+                        }
+                    },
+                    boxShadow: {
+                        'glow': '0 0 20px -5px rgba(59, 130, 246, 0.5)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Custom animations and scrollbar -->
+    <style>
+        body {
+            background-color: theme('colors.dark.bg');
+            color: theme('colors.dark.text');
+        }
+
+        /* Glassmorphism Utilities */
+        .glass {
+            background: rgba(30, 33, 43, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid theme('colors.dark.border');
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: theme('colors.dark.bg');
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: theme('colors.dark.border');
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: theme('colors.dark.muted');
+        }
+    </style>
+
     {% block head %}{% endblock %}
 </head>
-<body>
-    
-    <!-- Sidebar -->
-    <aside class="sidebar">
-        <img src="{{ url_for('static', filename='../assets/FICO2025-Full.jpg') }}" alt="FICO Logo" class="sidebar-logo" onerror="this.src='https://via.placeholder.com/250x80?text=FICO+Logo'">
-        <hr>
-        {% block sidebar %}{% endblock %}
-    </aside>
+
+<body class="flex min-h-screen bg-dark-bg text-dark-text antialiased selection:bg-brand-500 selection:text-white">
+
+
 
     <!-- Main Content -->
-    <main class="main-content">
-        <!-- Top Navigation -->
-        <nav class="top-nav">
-            <a href="{{ url_for('dashboard') }}" class="nav-btn {% if active_page == 'dashboard' %}active{% endif %}">Dashboard</a>
-            <a href="{{ url_for('generation') }}" class="nav-btn {% if active_page == 'generation' %}active{% endif %}">Generation</a>
-            <a href="{{ url_for('test_set') }}" class="nav-btn {% if active_page == 'test_set' %}active{% endif %}">Test Set</a>
-            <a href="{{ url_for('training') }}" class="nav-btn {% if active_page == 'training' %}active{% endif %}">Training</a>
-            <a href="{{ url_for('fine_tuning') }}" class="nav-btn {% if active_page == 'fine_tuning' %}active{% endif %}">Fine-Tuning</a>
-            <a href="{{ url_for('reports') }}" class="nav-btn {% if active_page == 'reports' %}active{% endif %}">Reports</a>
-            <a href="{{ url_for('projects') }}" class="nav-btn {% if active_page == 'projects' %}active{% endif %}">Projects</a>
-        </nav>
-        <hr>
+    <main class="flex-1 flex flex-col max-w-7xl mx-auto w-full">
+        <header class="p-4 sm:p-6 md:p-8 pb-4">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
+                <!-- Branding Header -->
+                <div class="flex items-center gap-4">
+                    <img src="{{ url_for('static', filename='../assets/FICO2025-Full.jpg') }}" alt="FICO Logo"
+                        class="h-10 rounded object-contain shadow-glow"
+                        onerror="this.src='https://placehold.co/120x40/2563eb/white?text=FICO'">
+                    <div
+                        class="text-xs sm:text-sm font-semibold tracking-wider text-brand-400 uppercase hidden sm:block">
+                        Synthetic Intelligence</div>
+                </div>
+            </div>
+
+            <!-- Top Navigation -->
+            <nav
+                class="flex flex-wrap items-center justify-center sm:justify-start gap-2 bg-dark-surface/40 p-2 rounded-xl border border-dark-border backdrop-blur-sm">
+                <a href="{{ url_for('dashboard') }}"
+                    class="px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 {% if active_page == 'dashboard' %}bg-brand-600 text-white shadow-glow{% else %}text-dark-muted hover:text-white hover:bg-dark-surface{% endif %}">
+                    Dashboard
+                </a>
+                <a href="{{ url_for('generation') }}"
+                    class="px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 {% if active_page == 'generation' %}bg-brand-600 text-white shadow-glow{% else %}text-dark-muted hover:text-white hover:bg-dark-surface{% endif %}">
+                    Generation
+                </a>
+                <a href="{{ url_for('test_set') }}"
+                    class="px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 {% if active_page == 'test_set' %}bg-brand-600 text-white shadow-glow{% else %}text-dark-muted hover:text-white hover:bg-dark-surface{% endif %}">
+                    Test Set
+                </a>
+                <a href="{{ url_for('training') }}"
+                    class="px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 {% if active_page == 'training' %}bg-brand-600 text-white shadow-glow{% else %}text-dark-muted hover:text-white hover:bg-dark-surface{% endif %}">
+                    Training
+                </a>
+                <a href="{{ url_for('fine_tuning') }}"
+                    class="px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 {% if active_page == 'fine_tuning' %}bg-brand-600 text-white shadow-glow{% else %}text-dark-muted hover:text-white hover:bg-dark-surface{% endif %}">
+                    Fine-Tuning
+                </a>
+                <a href="{{ url_for('reports') }}"
+                    class="px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 {% if active_page == 'reports' %}bg-brand-600 text-white shadow-glow{% else %}text-dark-muted hover:text-white hover:bg-dark-surface{% endif %}">
+                    Reports
+                </a>
+                <a href="{{ url_for('projects') }}"
+                    class="px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 {% if active_page == 'projects' %}bg-brand-600 text-white shadow-glow{% else %}text-dark-muted hover:text-white hover:bg-dark-surface{% endif %}">
+                    Projects
+                </a>
+            </nav>
+        </header>
 
         <!-- Page Content -->
-        {% block content %}{% endblock %}
+        <div class="px-4 sm:px-6 md:px-8 pb-12 flex-1 animate-fade-in">
+            {% block content %}{% endblock %}
+        </div>
     </main>
 
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        // Optional subtle page load animation
+        document.addEventListener("DOMContentLoaded", () => {
+            document.body.classList.add('opacity-100');
+        });
+    </script>
     {% block scripts %}{% endblock %}
 </body>
+
 </html>

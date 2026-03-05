@@ -1,36 +1,157 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1 class="page-title">Model Training</h1>
+<div class="mb-8">
+    <h1 class="text-3xl font-bold text-white tracking-tight">Model Training</h1>
+    <p class="text-dark-muted mt-2">Initialize base training processes for generative models.</p>
+</div>
 
-<div style="display: flex; gap: 2rem;">
+<div class="flex flex-col lg:flex-row gap-8">
     <!-- Sidebar Controls -->
-    <div
-        style="width: 300px; flex-shrink: 0; background: var(--sidebar-bg); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-color);">
-        <form id="trainForm">
-            <div class="form-group" style="margin-bottom: 2rem;">
-                <label class="form-label">Epochs: <span id="epochValue">3</span></label>
-                <input type="range" class="form-control" id="epochs" min="1" max="10" step="1" value="3"
-                    oninput="document.getElementById('epochValue').innerText = this.value">
-            </div>
-            <button type="button" class="btn btn-primary" onclick="startTraining()">Start Training</button>
-        </form>
+    <div class="w-full lg:w-80 flex-shrink-0">
+        <div class="bg-dark-surface p-6 rounded-2xl border border-dark-border shadow-lg">
+            <h3 class="text-lg font-semibold text-white mb-6 flex items-center gap-2">
+                <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+                Training Parameters
+            </h3>
+            <form id="trainForm">
+                <div class="mb-8">
+                    <div class="flex justify-between mb-2">
+                        <label class="text-sm font-medium text-dark-muted">Epochs</label>
+                        <span id="epochValue" class="text-sm font-bold text-emerald-400">3</span>
+                    </div>
+                    <input type="range" id="epochs" min="1" max="10" step="1" value="3"
+                        class="w-full h-1.5 bg-dark-bg rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                        oninput="document.getElementById('epochValue').innerText = this.value">
+                    <div class="flex justify-between mt-1 px-1">
+                        <span class="text-[10px] text-dark-muted">1</span>
+                        <span class="text-[10px] text-dark-muted">10</span>
+                    </div>
+                </div>
+                <button type="button" id="startTrainingBtn"
+                    class="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-500 text-white font-medium rounded-xl transition-all duration-200 shadow-lg shadow-emerald-500/20">Initiate
+                    Training</button>
+            </form>
+        </div>
     </div>
 
     <!-- Main Content -->
-    <div style="flex-grow: 1;">
-        <div id="statusContainer" class="status-container"></div>
+    <div class="flex-1 min-w-0">
+        <div id="statusContainer" class="hidden mb-6 p-4 rounded-xl border flex items-center gap-3"></div>
 
-        <div id="progressSection"
-            style="display: none; background: var(--sidebar-bg); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-color);">
-            <h3 style="margin-bottom: 1rem;">Training Progress</h3>
-            <div style="width: 100%; background-color: #e9ecef; border-radius: 4px; height: 1.5rem; overflow: hidden;">
-                <div id="progressBar"
-                    style="width: 0%; height: 100%; background-color: var(--primary-color); transition: width 0.5s ease; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.8rem; font-weight: bold;">
-                    0%</div>
+        <div id="progressSection" style="display: none;"
+            class="bg-dark-surface p-8 rounded-2xl border border-dark-border shadow-lg relative overflow-hidden animate-[fadeIn_0.5s_ease-out_forwards]">
+            <!-- Decorative background elements -->
+            <div class="absolute -right-20 -bottom-20 w-48 h-48 bg-emerald-500/5 rounded-full blur-3xl"></div>
+
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-semibold text-white flex items-center gap-3">
+                    <span class="relative flex h-3 w-3">
+                        <span
+                            class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                    </span>
+                    Training Active
+                </h3>
+                <span id="progressPercentage" class="text-2xl font-bold text-emerald-400">0%</span>
             </div>
-            <p id="progressText" style="margin-top: 1rem; color: var(--text-muted);">Initializing...</p>
+
+            <div class="w-full bg-dark-bg border border-dark-border/50 rounded-full h-3 mb-6 overflow-hidden">
+                <div id="progressBar"
+                    class="bg-gradient-to-r from-emerald-600 to-emerald-400 h-3 rounded-full transition-all duration-500 ease-out relative shadow-[0_0_10px_rgba(52,211,153,0.5)]"
+                    style="width: 0%">
+                    <div class="absolute inset-0 bg-white/20 animate-[shimmer_2s_infinite]"></div>
+                </div>
+            </div>
+
+            <div class="bg-dark-bg/50 border border-dark-border rounded-xl p-4 font-mono text-sm text-dark-muted">
+                <p id="progressText" class="flex items-center gap-2">
+                    <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-emerald-500" xmlns="http://www.w3.org/2000/svg"
+                        fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
+                        </circle>
+                        <path class="opacity-75" fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                        </path>
+                    </svg>
+                    Initializing environment...
+                </p>
+            </div>
+        </div>
+
+        <div id="trainPlaceholder"
+            class="h-full min-h-[300px] border-2 border-dashed border-dark-border/50 rounded-2xl flex flex-col items-center justify-center text-center p-8">
+            <svg class="w-16 h-16 text-dark-muted mb-4 opacity-50" fill="none" stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z">
+                </path>
+            </svg>
+            <h3 class="text-lg font-medium text-white mb-2">Systems Ready</h3>
+            <p class="text-dark-muted max-w-sm">Configure your epochs and initiate training to build the next iteration.
+            </p>
         </div>
     </div>
 </div>
+
+<style>
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes shimmer {
+        0% {
+            transform: translateX(-100%);
+        }
+
+        100% {
+            transform: translateX(100%);
+        }
+    }
+</style>
+<script>
+    // small hack to hide placeholder and update percentage text
+    const origStartTrain = window.startTraining;
+    if (origStartTrain) {
+        window.startTraining = async function () {
+            document.getElementById('trainPlaceholder').style.display = 'none';
+            await origStartTrain();
+        }
+    } else {
+        document.addEventListener("DOMContentLoaded", () => {
+            const btn = document.querySelector('button[onclick="startTraining()"]');
+            if (btn) {
+                btn.addEventListener('click', () => {
+                    document.getElementById('trainPlaceholder').style.display = 'none';
+                });
+            }
+        });
+    }
+
+    // Observer to update percentage text based on progress bar width
+    const observer = new MutationObserver(function (mutations) {
+        mutations.forEach(function (mutation) {
+            if (mutation.attributeName === "style") {
+                const width = mutation.target.style.width;
+                document.getElementById('progressPercentage').innerText = width;
+            }
+        });
+    });
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const pBar = document.getElementById('progressBar');
+        if (pBar) observer.observe(pBar, { attributes: true });
+    });
+</script>
 {% endblock %}

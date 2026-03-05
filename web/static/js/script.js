@@ -1,29 +1,36 @@
-// Helper to show status message
+// Helper to show status message using Tailwind classes
 function showStatus(message, type = 'success') {
     const container = document.getElementById('statusContainer');
     if (!container) return;
 
-    container.style.display = 'block';
-    container.textContent = message;
+    container.classList.remove('hidden');
+    // Remove previous color classes
+    container.className = 'mb-6 p-4 rounded-xl border flex items-center gap-3 animate-fade-in shadow-lg';
+
+    // Icon SVGs
+    const successIcon = `<svg class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+    const infoIcon = `<svg class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+    const errorIcon = `<svg class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>`;
+
+    let icon = successIcon;
 
     if (type === 'success') {
-        container.style.backgroundColor = '#f0fdf4';
-        container.style.borderColor = '#bbf7d0';
-        container.style.color = '#166534';
+        container.classList.add('bg-emerald-500/10', 'border-emerald-500/30', 'text-emerald-400');
+        icon = successIcon;
     } else if (type === 'info') {
-        container.style.backgroundColor = '#eff6ff';
-        container.style.borderColor = '#bfdbfe';
-        container.style.color = '#1e3a8a';
+        container.classList.add('bg-brand-500/10', 'border-brand-500/30', 'text-brand-400');
+        icon = infoIcon;
     } else {
-        container.style.backgroundColor = '#fef2f2';
-        container.style.borderColor = '#fecaca';
-        container.style.color = '#991b1b';
+        container.classList.add('bg-red-500/10', 'border-red-500/30', 'text-red-400');
+        icon = errorIcon;
     }
+
+    container.innerHTML = `${icon} <span class="font-medium">${message}</span>`;
 
     // Auto hide after 5 seconds if success or error
     if (type !== 'info') {
         setTimeout(() => {
-            container.style.display = 'none';
+            container.classList.add('hidden');
         }, 5000);
     }
 }
@@ -46,7 +53,7 @@ async function handleFileUpload(event) {
         const result = await response.json();
 
         if (response.ok) {
-            showStatus('Dataset uploaded successfully! ✅');
+            showStatus('Dataset uploaded successfully!', 'success');
             setTimeout(() => window.location.reload(), 1500);
         } else {
             showStatus(`Upload failed: ${result.message}`, 'error');
@@ -85,7 +92,7 @@ async function generateDataset() {
         });
 
         if (response.ok) {
-            showStatus('Generation complete ✅');
+            showStatus('Generation complete!', 'success');
             setTimeout(() => window.location.reload(), 1500);
         } else {
             showStatus('Generation failed', 'error');
@@ -107,13 +114,27 @@ async function runEvaluation() {
     document.getElementById('evalResults').style.display = 'none';
 
     try {
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+
+        // Upload first before evaluating
+        const uploadRes = await fetch('/api/upload', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!uploadRes.ok) {
+            showStatus('Test set upload failed.', 'error');
+            return;
+        }
+
         const response = await fetch('/api/evaluate', {
             method: 'POST'
         });
         const data = await response.json();
 
         if (response.ok) {
-            showStatus('Evaluation complete ✅');
+            showStatus('Evaluation complete!', 'success');
             document.getElementById('evalResults').style.display = 'block';
             document.getElementById('accValue').textContent = data.accuracy;
             document.getElementById('f1Value').textContent = data.f1_score;
@@ -136,10 +157,9 @@ async function startTraining() {
 
     progressSection.style.display = 'block';
     progressBar.style.width = '0%';
-    progressBar.textContent = '0%';
+    progressText.innerHTML = '<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-emerald-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Initializing environment...';
 
     try {
-        // We notify server to start, but here we just simulate the progress bar for UX
         const response = await fetch('/api/train', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -153,15 +173,14 @@ async function startTraining() {
                 const percentage = Math.round((currentEpoch / epochs) * 100);
 
                 progressBar.style.width = `${percentage}%`;
-                progressBar.textContent = `${percentage}%`;
-                progressText.textContent = `Epoch ${currentEpoch}/${epochs} complete`;
+                progressText.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-emerald-500 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Epoch ${currentEpoch}/${epochs} complete`;
 
                 if (currentEpoch >= epochs) {
                     clearInterval(interval);
-                    showStatus('Training successful! ✅');
-                    progressText.textContent = 'Training Finished ✅';
+                    showStatus('Training successful!', 'success');
+                    progressText.innerHTML = 'Training Finished ✅';
                 }
-            }, 700); // simulate 0.7s per epoch like in streamlit
+            }, 700);
 
         } else {
             showStatus('Training failed to start', 'error');
@@ -187,7 +206,7 @@ async function applyFinetuning() {
         });
 
         if (response.ok) {
-            showStatus('Fine-tuning applied. ✅');
+            showStatus('Fine-tuning applied successfully.', 'success');
         } else {
             showStatus('Fine-tuning failed', 'error');
         }

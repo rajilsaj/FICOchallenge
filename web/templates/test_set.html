@@ -1,38 +1,117 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1 class="page-title">Model Evaluation</h1>
+<div class="mb-8">
+    <h1 class="text-3xl font-bold text-white tracking-tight">Model Evaluation</h1>
+    <p class="text-dark-muted mt-2">Test generated scenarios against benchmark performance.</p>
+</div>
 
-<div style="display: flex; gap: 2rem;">
+<div class="flex flex-col lg:flex-row gap-8">
     <!-- Sidebar Controls -->
-    <div
-        style="width: 300px; flex-shrink: 0; background: var(--sidebar-bg); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-color);">
-        <form id="evalForm">
-            <div class="form-group" style="margin-bottom: 2rem;">
-                <label class="form-label">Upload Test Set (CSV)</label>
-                <input type="file" id="testFile" class="form-control" accept=".csv" required>
-            </div>
-            <button type="button" class="btn btn-primary" onclick="runEvaluation()">Run Evaluation</button>
-        </form>
+    <div class="w-full lg:w-80 flex-shrink-0">
+        <div class="bg-dark-surface p-6 rounded-2xl border border-dark-border shadow-lg">
+            <h3 class="text-lg font-semibold text-white mb-6 flex items-center gap-2">
+                <svg class="w-5 h-5 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Evaluation Configuration
+            </h3>
+            <form id="evalForm">
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-dark-muted mb-2">Upload Test Set (CSV)</label>
+                    <div
+                        class="border-2 border-dashed border-dark-border/80 hover:border-brand-500 rounded-xl p-4 text-center bg-dark-bg/50 cursor-pointer transition-all duration-300 relative group">
+                        <input type="file" id="testFile"
+                            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" accept=".csv" required>
+                        <div class="flex flex-col items-center justify-center pointer-events-none">
+                            <svg class="w-8 h-8 text-dark-muted group-hover:text-brand-400 mb-2 transition-colors"
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
+                                </path>
+                            </svg>
+                            <span class="text-sm font-medium text-white">Select File</span>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" id="runEvalBtn"
+                    class="w-full py-3 px-4 bg-brand-600 hover:bg-brand-500 text-white font-medium rounded-xl transition-all duration-200 shadow-lg shadow-brand-500/20">Run
+                    Evaluation</button>
+            </form>
+        </div>
     </div>
 
     <!-- Main Content -->
-    <div style="flex-grow: 1;">
-        <div id="statusContainer" class="status-container"></div>
+    <div class="flex-1 min-w-0">
+        <div id="statusContainer" class="hidden mb-6 p-4 rounded-xl border flex items-center gap-3"></div>
 
-        <div id="evalResults" style="display: none;">
-            <div class="metrics-container">
-                <div class="metric-card">
-                    <div class="metric-label">Accuracy</div>
-                    <div class="metric-value" id="accValue">--</div>
+        <div id="evalResults" style="display: none;" class="animate-[fadeIn_0.5s_ease-out_forwards]">
+            <h3 class="text-xl font-semibold text-white mb-4">Evaluation Results</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <!-- Accuracy Card -->
+                <div
+                    class="bg-gradient-to-br from-dark-surface to-dark-bg p-6 rounded-2xl border border-dark-border shadow-lg relative overflow-hidden group">
+                    <div
+                        class="absolute -right-6 -top-6 w-24 h-24 bg-brand-500/10 rounded-full blur-xl group-hover:bg-brand-500/20 transition-colors">
+                    </div>
+                    <div class="text-sm font-medium text-dark-muted uppercase tracking-wider mb-2">Accuracy</div>
+                    <div class="flex items-baseline gap-2">
+                        <div class="text-5xl font-bold text-white tracking-tight" id="accValue">--</div>
+                    </div>
                 </div>
 
-                <div class="metric-card">
-                    <div class="metric-label">F1 Score</div>
-                    <div class="metric-value" id="f1Value">--</div>
+                <!-- F1 Score Card -->
+                <div
+                    class="bg-gradient-to-br from-dark-surface to-dark-bg p-6 rounded-2xl border border-dark-border shadow-lg relative overflow-hidden group">
+                    <div
+                        class="absolute -right-6 -top-6 w-24 h-24 bg-purple-500/10 rounded-full blur-xl group-hover:bg-purple-500/20 transition-colors">
+                    </div>
+                    <div class="text-sm font-medium text-dark-muted uppercase tracking-wider mb-2">F1 Score</div>
+                    <div class="flex items-baseline gap-2">
+                        <div class="text-5xl font-bold text-white tracking-tight" id="f1Value">--</div>
+                    </div>
                 </div>
             </div>
+
+            <div
+                class="mt-8 bg-dark-surface p-6 rounded-2xl border border-dark-border flex items-center justify-between">
+                <div>
+                    <h4 class="text-sm font-semibold text-white">Detailed Report</h4>
+                    <p class="text-xs text-dark-muted mt-1">Full class-by-class evaluation breakdown.</p>
+                </div>
+                <button
+                    class="px-4 py-2 bg-dark-bg hover:bg-dark-border border border-dark-border text-white text-sm font-medium rounded-lg transition-colors">View
+                    Details</button>
+            </div>
+        </div>
+
+        <div id="evalPlaceholder"
+            class="h-full min-h-[300px] border-2 border-dashed border-dark-border/50 rounded-2xl flex flex-col items-center justify-center text-center p-8">
+            <svg class="w-16 h-16 text-dark-muted mb-4 opacity-50" fill="none" stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01">
+                </path>
+            </svg>
+            <h3 class="text-lg font-medium text-white mb-2">Awaiting Evaluation</h3>
+            <p class="text-dark-muted max-w-sm">Upload a test set and run the evaluation to see benchmark results.</p>
         </div>
     </div>
 </div>
+
+<style>
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
 {% endblock %}

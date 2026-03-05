@@ -1,108 +1,217 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1 class="page-title">Synthetic Data Generation</h1>
+<div class="mb-8">
+    <h1 class="text-3xl font-bold text-white tracking-tight">Synthetic Data Generation</h1>
+    <p class="text-dark-muted mt-2">Upload an existing dataset or generate new synthetic data using LLMs.</p>
+</div>
 
-<div style="display: flex; gap: 2rem;">
-    <!-- Sidebar Controls inside page -->
-    <div
-        style="width: 300px; flex-shrink: 0; background: var(--sidebar-bg); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-color);">
-        <h3 class="sidebar-heading">Upload Existing Dataset</h3>
-        <form id="uploadForm">
-            <div class="file-upload" onclick="document.getElementById('csvFile').click()">
-                <p>Click to upload CSV</p>
-                <input type="file" id="csvFile" accept=".csv" onchange="handleFileUpload(event)">
+<div class="flex flex-col lg:flex-row gap-8">
+    <!-- Sidebar Controls -->
+    <div class="w-full lg:w-80 flex-shrink-0 space-y-6">
+
+        <!-- Upload Card -->
+        <div class="bg-dark-surface p-6 rounded-2xl border border-dark-border shadow-lg relative overflow-hidden group">
+            <div
+                class="absolute inset-0 bg-brand-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             </div>
-        </form>
+            <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                </svg>
+                Upload Dataset
+            </h3>
+            <form id="uploadForm">
+                <div id="uploadZone"
+                    class="border-2 border-dashed border-brand-500/50 hover:border-brand-400 rounded-xl p-6 text-center bg-brand-500/10 cursor-pointer transition-all duration-300 group-hover:bg-brand-500/20 shadow-[0_0_15px_rgba(59,130,246,0.15)] group-hover:shadow-[0_0_20px_rgba(59,130,246,0.25)]">
+                    <div
+                        class="bg-brand-500/20 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 shadow-inner border border-brand-500/30">
+                        <svg class="w-6 h-6 text-brand-400 group-hover:text-brand-300 transition-colors" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
+                            </path>
+                        </svg>
+                    </div>
+                    <p class="text-sm font-medium text-brand-100">Click to upload CSV</p>
+                    <p class="text-xs text-brand-300/80 mt-1">or drag and drop</p>
+                    <input type="file" id="csvFile" accept=".csv" class="hidden">
+                </div>
+            </form>
+        </div>
 
-        <hr>
-        <div style="text-align: center; color: var(--text-muted); margin: 1rem 0;">OR</div>
-        <hr>
+        <div class="flex items-center gap-4 py-2">
+            <hr class="flex-1 border-dark-border">
+            <span class="text-xs font-medium text-dark-muted uppercase tracking-wider">OR</span>
+            <hr class="flex-1 border-dark-border">
+        </div>
 
-        <h3 class="sidebar-heading">Generate Custom Dataset</h3>
-        <form id="generateForm">
-            <div class="form-group">
-                <label class="form-label">Model</label>
-                <select class="form-control" id="modelSelect">
-                    <option>Llama 3.1 (Unsloth)</option>
-                    <option>Mistral</option>
-                    <option>Ollama</option>
-                </select>
-            </div>
+        <!-- Generation Card -->
+        <div class="bg-dark-surface p-6 rounded-2xl border border-dark-border shadow-lg">
+            <h3 class="text-lg font-semibold text-white mb-6 flex items-center gap-2">
+                <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z">
+                    </path>
+                </svg>
+                Generate Custom
+            </h3>
 
-            <div class="form-group">
-                <label class="form-label">Temperature: <span id="tempValue">0.7</span></label>
-                <input type="range" class="form-control" id="temperature" min="0.1" max="1.5" step="0.1" value="0.7"
-                    oninput="document.getElementById('tempValue').innerText = this.value">
-            </div>
+            <form id="generateForm" class="space-y-5">
+                <div>
+                    <label class="block text-sm font-medium text-dark-muted mb-2">Model</label>
+                    <select id="modelSelect"
+                        class="w-full bg-dark-bg border border-dark-border rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all appearance-none cursor-pointer">
+                        <option>Llama 3.1 (Unsloth)</option>
+                        <option>Mistral</option>
+                        <option>Ollama</option>
+                    </select>
+                </div>
 
-            <div class="form-group">
-                <label class="form-label">Number of Scenarios</label>
-                <input type="number" class="form-control" id="numScenarios" min="1" max="100" value="5">
-            </div>
+                <div>
+                    <div class="flex justify-between mb-2">
+                        <label class="text-sm font-medium text-dark-muted">Temperature</label>
+                        <span id="tempValue" class="text-sm font-bold text-brand-400">0.7</span>
+                    </div>
+                    <input type="range" id="temperature" min="0.1" max="1.5" step="0.1" value="0.7"
+                        class="w-full h-1.5 bg-dark-bg rounded-lg appearance-none cursor-pointer accent-brand-500"
+                        oninput="document.getElementById('tempValue').innerText = this.value">
+                </div>
 
-            <div class="form-group">
-                <label class="form-label">Variants per Scenario</label>
-                <input type="number" class="form-control" id="numVariants" min="1" max="20" value="5">
-            </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-dark-muted mb-2 truncate"
+                            title="Number of Scenarios">Scenarios</label>
+                        <input type="number" id="numScenarios" min="1" max="100" value="5"
+                            class="w-full bg-dark-bg border border-dark-border rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-dark-muted mb-2 truncate"
+                            title="Variants per Scenario">Variants</label>
+                        <input type="number" id="numVariants" min="1" max="20" value="5"
+                            class="w-full bg-dark-bg border border-dark-border rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all">
+                    </div>
+                </div>
 
-            <div class="form-group">
-                <label class="form-label">Sentiments</label>
-                <select class="form-control" id="sentiments" multiple style="height: 100px;">
-                    <option value="angry">angry</option>
-                    <option value="confused">confused</option>
-                    <option value="neutral" selected>neutral</option>
-                    <option value="frustrated">frustrated</option>
-                </select>
-                <small style="color: var(--text-muted);">Hold Ctrl/Cmd to select multiple</small>
-            </div>
+                <div>
+                    <label class="block text-sm font-medium text-dark-muted mb-2">Sentiments</label>
+                    <select id="sentiments" multiple
+                        class="w-full h-24 bg-dark-bg border border-dark-border rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all scrollbar-thin scrollbar-thumb-dark-border">
+                        <option value="angry" class="py-1 px-2 mb-1 rounded hover:bg-dark-surface">angry</option>
+                        <option value="confused" class="py-1 px-2 mb-1 rounded hover:bg-dark-surface">confused</option>
+                        <option value="neutral" selected
+                            class="py-1 px-2 mb-1 rounded bg-brand-500/20 text-brand-100 hover:bg-brand-500/30">neutral
+                        </option>
+                        <option value="frustrated" class="py-1 px-2 rounded hover:bg-dark-surface">frustrated</option>
+                    </select>
+                    <p class="text-xs text-dark-muted mt-1.5">Hold Ctrl/Cmd to select multiple</p>
+                </div>
 
-            <div class="form-group">
-                <label class="form-label">Speech Types</label>
-                <select class="form-control" id="speechTypes" multiple style="height: 100px;">
-                    <option value="casual">casual</option>
-                    <option value="professional" selected>professional</option>
-                    <option value="slang">slang</option>
-                    <option value="typos">typos</option>
-                </select>
-                <small style="color: var(--text-muted);">Hold Ctrl/Cmd to select multiple</small>
-            </div>
+                <div>
+                    <label class="block text-sm font-medium text-dark-muted mb-2">Speech Types</label>
+                    <select id="speechTypes" multiple
+                        class="w-full h-24 bg-dark-bg border border-dark-border rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all scrollbar-thin scrollbar-thumb-dark-border">
+                        <option value="casual" class="py-1 px-2 mb-1 rounded hover:bg-dark-surface">casual</option>
+                        <option value="professional" selected
+                            class="py-1 px-2 mb-1 rounded bg-brand-500/20 text-brand-100 hover:bg-brand-500/30">
+                            professional</option>
+                        <option value="slang" class="py-1 px-2 mb-1 rounded hover:bg-dark-surface">slang</option>
+                        <option value="typos" class="py-1 px-2 rounded hover:bg-dark-surface">typos</option>
+                    </select>
+                </div>
 
-            <button type="button" class="btn btn-primary" onclick="generateDataset()">Generate Dataset</button>
-        </form>
+                <button type="button" id="generateBtn"
+                    class="w-full py-3 px-4 bg-brand-600 hover:bg-brand-500 text-white font-medium rounded-xl transition-all duration-200 shadow-lg shadow-brand-500/20 focus:ring-2 focus:ring-offset-2 focus:ring-offset-dark-surface focus:ring-brand-500 flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                    Start Generation
+                </button>
+            </form>
+        </div>
     </div>
 
-    <!-- Main Generation Output -->
-    <div style="flex-grow: 1;">
-        <div id="statusContainer" class="status-container"></div>
+    <!-- Main Output Area -->
+    <div class="flex-1 min-w-0">
+        <div id="statusContainer" class="hidden mb-6 p-4 rounded-xl border flex items-center gap-3"></div>
 
         {% if preview_data %}
-        <div id="previewSection">
-            <h3 style="margin-bottom: 1rem;">Preview</h3>
-            <div class="table-responsive">
-                <table class="table">
-                    <thead>
+        <div id="previewSection"
+            class="bg-dark-surface rounded-2xl border border-dark-border shadow-lg overflow-hidden flex flex-col h-full opacity-0 animate-[fadeIn_0.5s_ease-out_forwards]">
+            <div class="p-6 border-b border-dark-border flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-white">Dataset Preview</h3>
+                    <p class="text-sm text-dark-muted mt-1">Showing first {{ preview_data|length }} rows of generated
+                        set</p>
+                </div>
+                <a href="{{ url_for('download') }}"
+                    class="px-4 py-2 bg-dark-bg hover:bg-dark-border border border-dark-border hover:border-brand-500/50 text-white text-sm font-medium rounded-lg transition-all duration-200 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                    Export CSV
+                </a>
+            </div>
+
+            <div class="overflow-x-auto p-0 flex-1">
+                <table class="w-full text-left text-sm whitespace-nowrap">
+                    <thead class="bg-dark-bg/50 text-dark-muted border-b border-dark-border">
                         <tr>
                             {% for col in columns %}
-                            <th>{{ col }}</th>
+                            <th class="px-6 py-4 font-medium">{{ col }}</th>
                             {% endfor %}
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="divide-y divide-dark-border/50 text-white">
                         {% for row in preview_data %}
-                        <tr>
+                        <tr class="hover:bg-dark-bg/30 transition-colors">
                             {% for col in columns %}
-                            <td>{{ row[col] }}</td>
+                            <td class="px-6 py-4">
+                                {% if row[col]|string|length > 50 %}
+                                <span title="{{ row[col] }}">{{ row[col][:50] }}...</span>
+                                {% else %}
+                                {{ row[col] }}
+                                {% endif %}
+                            </td>
                             {% endfor %}
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
-
-            <a href="{{ url_for('download') }}" class="btn btn-primary" style="width: auto;">Download Dataset</a>
+        </div>
+        {% else %}
+        <div
+            class="h-full min-h-[400px] border-2 border-dashed border-dark-border/50 rounded-2xl flex flex-col items-center justify-center text-center p-8">
+            <div class="w-20 h-20 bg-dark-surface rounded-full flex items-center justify-center mb-6">
+                <svg class="w-10 h-10 text-dark-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4">
+                    </path>
+                </svg>
+            </div>
+            <h3 class="text-xl font-medium text-white mb-2">No Dataset Generated Yet</h3>
+            <p class="text-dark-muted max-w-sm mx-auto">Upload an existing CSV file or configure parameters on the left
+                to start generating synthetic intelligence data.</p>
         </div>
         {% endif %}
     </div>
 </div>
+
+<style>
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
 {% endblock %}
