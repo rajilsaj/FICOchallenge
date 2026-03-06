@@ -1,0 +1,5 @@
+intent,description
+PAYMENT_ARRANGEMENT,The customer agrees to a payment plan.
+DISPUTE_BALANCE,The customer disputes the amount owed.
+HARDSHIP_REQUEST,The customer requests assistance due to financial hardship.
+FALLBACK,Out of scope request.

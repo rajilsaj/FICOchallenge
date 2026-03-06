@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synthetic Data Generator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <div id="app" class="container">
+        <h1>Synthetic Data Generator</h1>
+        
+        <!-- Configuration Section -->
+        <section class="card">
+            <h2>Model Configuration</h2>
+            <div class="form-group">
+                <label>Model Name:</label>
+                <input type="text" v-model="model_name" placeholder="e.g., unsloth/Meta-Llama-3.1-8B-Instruct">
+                <button @click="loadModel" :disabled="loading">Load Model</button>
+            </div>
+            <div class="form-group">
+                <label>Temperature:</label>
+                <input type="number" v-model="config.temperature" step="0.1" min="0" max="1.5">
+            </div>
+            <div class="form-group">
+                <label>Num Scenarios (per intent):</label>
+                <input type="number" v-model="config.num_scenarios" min="1">
+            </div>
+            <div class="form-group">
+                <label>Num Variants (per scenario):</label>
+                <input type="number" v-model="config.num_variants" min="1">
+            </div>
+            <button @click="saveConfig">Save Config</button>
+        </section>
+
+        <!-- Intent Schema Section -->
+        <section class="card">
+            <h2>Intent Schema</h2>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Intent</th>
+                        <th>Description</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(item, index) in intents" :key="index">
+                        <td><input v-model="item.intent"></td>
+                        <td><input v-model="item.description"></td>
+                        <td><button @click="removeIntent(index)">Delete</button></td>
+                    </tr>
+                </tbody>
+            </table>
+            <button @click="addIntent">Add Intent</button>
+            <button @click="saveIntents">Save Intent Schema</button>
+        </section>
+
+        <!-- Generation Controls -->
+        <section class="card">
+            <h2>Generation Controls</h2>
+            <div class="form-group">
+                <label>Select Intent for Single Scenario (1):</label>
+                <select v-model="selected_intent">
+                    <option v-for="intent in intents" :value="intent">{{ intent.intent }}</option>
+                </select>
+                <button @click="generateSingleScenario" :disabled="loading || !selected_intent">Generate Single Scenario</button>
+            </div>
+            <hr>
+            <div class="btn-group">
+                <button @click="generateAllScenarios" :disabled="loading" class="primary">Generate All Scenarios (2)</button>
+            </div>
+            <hr>
+            <div class="form-group">
+                <label>Folder Name Parameter:</label>
+                <input type="text" v-model="name_folder_parameter" placeholder="e.g., test_run">
+                <button @click="generateConversations" :disabled="loading" class="secondary">Generate Conversations (3)</button>
+            </div>
+        </section>
+
+        <!-- Status & Logs -->
+        <section class="card status" v-if="status">
+            <h2>Status</h2>
+            <div :class="status.type" class="message">
+                {{ status.message }}
+                <p v-if="status.file">File: {{ status.file }}</p>
+                <p v-if="status.folder">Folder: {{ status.folder }}</p>
+            </div>
+        </section>
+
+        <div v-if="loading" class="loader-overlay">
+            <div class="loader"></div>
+            <p>Processing... please wait (this might take a while if running on GPU)</p>
+        </div>
+    </div>
+
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                model_name: '{{ model_name }}',
+                config: JSON.parse('{{ config | safe }}'),
+                intents: [],
+                selected_intent: null,
+                name_folder_parameter: 'my_dataset',
+                loading: false,
+                status: null
+            },
+            mounted() {
+                this.fetchIntents();
+            },
+            methods: {
+                fetchIntents() {
+                    axios.get('/api/intents').then(res => {
+                        this.intents = res.data;
+                    });
+                },
+                saveConfig() {
+                    axios.post('/api/config', {
+                        model_name: this.model_name,
+                        ...this.config
+                    }).then(res => {
+                        alert('Config saved!');
+                    });
+                },
+                loadModel() {
+                    this.loading = true;
+                    this.status = null;
+                    axios.post('/api/load_model').then(res => {
+                        this.status = { type: 'success', message: res.data.message };
+                    }).catch(err => {
+                        this.status = { type: 'error', message: err.response.data.message };
+                    }).finally(() => {
+                        this.loading = false;
+                    });
+                },
+                generateSingleScenario() {
+                    this.loading = true;
+                    this.status = null;
+                    axios.post('/api/generate/scenario', {
+                        intent: this.selected_intent.intent,
+                        description: this.selected_intent.description
+                    }).then(res => {
+                        this.status = { 
+                            type: 'success', 
+                            message: 'Generated scenarios for ' + this.selected_intent.intent + ': ' + res.data.scenarios.join(' | ') 
+                        };
+                    }).catch(err => {
+                        this.status = { type: 'error', message: err.response.data.message };
+                    }).finally(() => {
+                        this.loading = false;
+                    });
+                },
+                addIntent() {
+                    this.intents.push({ intent: '', description: '' });
+                },
+                removeIntent(index) {
+                    this.intents.splice(index, 1);
+                },
+                saveIntents() {
+                    axios.post('/api/intents', this.intents).then(res => {
+                        alert('Intents saved!');
+                    });
+                },
+                generateAllScenarios() {
+                    this.loading = true;
+                    this.status = null;
+                    axios.post('/api/generate/all_scenarios').then(res => {
+                        this.status = { type: 'success', message: 'All Scenarios generated successfully!', file: res.data.file };
+                    }).catch(err => {
+                        this.status = { type: 'error', message: err.response.data.message };
+                    }).finally(() => {
+                        this.loading = false;
+                    });
+                },
+                generateConversations() {
+                    this.loading = true;
+                    this.status = null;
+                    axios.post('/api/generate/conversations', {
+                        name_folder: this.name_folder_parameter
+                    }).then(res => {
+                        this.status = { type: 'success', message: 'Conversations generated!', folder: res.data.folder };
+                    }).catch(err => {
+                        this.status = { type: 'error', message: err.response.data.message };
+                    }).finally(() => {
+                        this.loading = false;
+                    });
+                }
+            }
+        });
+    </script>
+</body>
+</html>

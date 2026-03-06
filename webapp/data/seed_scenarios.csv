@@ -1,0 +1,5 @@
+intent,scenario
+PAYMENT_ARRANGEMENT,Customer lost their job but just got a new one and wants to pay in installments.
+DISPUTE_BALANCE,Customer claims they already paid the bill last week via bank transfer.
+HARDSHIP_REQUEST,Customer is facing medical emergency and cannot pay this month.
+FALLBACK,Customer asks about the weather in London.
